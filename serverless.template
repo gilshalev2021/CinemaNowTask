@@ -1,0 +1,159 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Outputs": {
+		"ApiURL": {
+			"Description": "API endpoint URL for Prod environment",
+			"Value": {
+				"Fn::Sub": "https://${CinemaNowApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+			}
+		}
+	},
+	"Parameters": {
+		"DynamoDbMovies": {
+			"Type": "String",
+			"Description": "Movies dynamodb name",
+			"Default": "cinema-now-movies"
+		},
+		"DynamoDbShows": {
+			"Type": "String",
+			"Description": "Shows dynamodb name",
+			"Default": "cinema-now-shows"
+		},
+		"DynamoDbTheaters": {
+			"Type": "String",
+			"Description": "Theaters dynamodb name",
+			"Default": "cinema-now-theaters"
+		}
+	},
+	"Globals": {
+		"Function": {
+			"Tags": {
+				"Owner": "shalev.gil@intel.com"
+			}
+		}
+	},
+	"Description": "CinemaNow api for management app.",
+	"Resources": {
+		"CinemaNowDynamoDbMovies": {
+			"Type": "AWS::DynamoDB::Table",
+			"Properties": {
+				"TableName": {
+					"Ref": "DynamoDbMovies"
+				},
+				"AttributeDefinitions": [{
+					"AttributeName": "Id",
+					"AttributeType": "S"
+				}],
+				"KeySchema": [{
+					"AttributeName": "Id",
+					"KeyType": "HASH"
+				}],
+				"ProvisionedThroughput": {
+					"ReadCapacityUnits": 5,
+					"WriteCapacityUnits": 5
+				}
+			}
+		},
+		"CinemaNowDynamoDbShows": {
+			"Type": "AWS::DynamoDB::Table",
+			"Properties": {
+				"TableName": {
+					"Ref": "DynamoDbShows"
+				},
+				"AttributeDefinitions": [{
+					"AttributeName": "Id",
+					"AttributeType": "S"
+				}],
+				"KeySchema": [{
+					"AttributeName": "Id",
+					"KeyType": "HASH"
+				}],
+				"ProvisionedThroughput": {
+					"ReadCapacityUnits": 5,
+					"WriteCapacityUnits": 5
+				}
+			}
+		},
+		"CinemaNowDynamoDbTheaters": {
+			"Type": "AWS::DynamoDB::Table",
+			"Properties": {
+				"TableName": {
+					"Ref": "DynamoDbTheaters"
+				},
+				"AttributeDefinitions": [{
+					"AttributeName": "Id",
+					"AttributeType": "S"
+				}],
+				"KeySchema": [{
+					"AttributeName": "Id",
+					"KeyType": "HASH"
+				}],
+				"ProvisionedThroughput": {
+					"ReadCapacityUnits": 5,
+					"WriteCapacityUnits": 5
+				}
+			}
+		},
+		"CinemaNowApi": {
+			"Type": "AWS::Serverless::Api",
+			"Properties": {
+				"StageName": "Prod"
+			}
+		},
+		"Fd19ControllerFunction": {
+			"Type": "AWS::Serverless::Function",
+			"Properties": {
+				"Handler": "CinemaNowApi::CinemaNowApi.LambdaEntryPoint::FunctionHandlerAsync",
+				"Runtime": "dotnetcore3.1",
+				"Environment": {
+					"Variables": {
+						"CINEMA_NOW_DYNAMO_DB_MOVIES": {
+							"Ref": "CinemaNowDynamoDbMovies"
+						},
+						"CINEMA_NOW_DYNAMO_DB_SHOWS": {
+							"Ref": "CinemaNowDynamoDbShows"
+						},
+						"CINEMA_NOW_DYNAMO_DB_THEATERS": {
+							"Ref": "CinemaNowDynamoDbTheaters"
+						}
+					}
+				},
+				"CodeUri": "",
+				"MemorySize": 256,
+				"Timeout": 30,
+				"Role": null,
+				"Policies": [
+					"AWSLambdaFullAccess",
+					"AmazonAPIGatewayInvokeFullAccess",
+					"AmazonDynamoDBFullAccess",
+					"AmazonS3FullAccess"
+				],
+				"Events": {
+					"ProxyResource": {
+						"Type": "Api",
+						"Properties": {
+							"RestApiId": {
+								"Ref": "CinemaNowApi"
+							},
+							"Path": "/{proxy+}",
+							"Method": "ANY"
+						}
+					},
+					"RootResource": {
+						"Type": "Api",
+						"Properties": {
+							"RestApiId": {
+								"Ref": "CinemaNowApi"
+							},
+							"Path": "/",
+							"Method": "ANY"
+						}
+					}
+				}
+			}
+		}
+
+
+	},
+	"Transform": "AWS::Serverless-2016-10-31"
+}

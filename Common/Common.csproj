@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="rds-ca-2019-root.pem" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="rds-ca-2019-root.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aws4RequestSigner" Version="0.9.0" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.104.23" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.110.24" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.1" />
+    <PackageReference Include="MongoDB.Bson" Version="2.10.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.10.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.FileProviders.Embedded">
+      <HintPath>..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.embedded\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Embedded.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
